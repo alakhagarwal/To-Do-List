@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <header>
+      <i class="fa-solid fa-bars"></i>
+      <p>ToDo</p>
+    </header>
+
+    <main>
+      <div class="left-panel">
+        <div class="optns">
+          <div class="project-heading">
+            <h3>Projects <span id="count"></span></h3>
+            <div class="toggleProjectform">+</div>
+          </div>
+
+          <div class="project-list">
+            <!-- Projects goes here -->
+          </div>
+        </div>
+        <form class="project-form">
+          <input
+            id="project-title"
+            type="text"
+            placeholder="Add new project"
+            required
+          />
+          <button class="project-Submitbtn" type="submit">Add</button>
+        </form>
+      </div>
+
+      <div class="right-panel">
+        <div class="todos-list">
+          <!-- <div class="task">
+            <div class="info">
+              <button class="checkbox checked">&check;</button>
+              <span>todo title</span>
+            </div>
+
+            <i class="fa-solid fa-xmark"></i>
+          </div>
+
+          <div class="task">
+            <div class="info">
+              <button class="checkbox checked">&check;</button>
+              <span>todo title</span>
+            </div>
+
+            <i class="fa-solid fa-xmark"></i>
+          </div> -->
+        </div>
+
+        <div class="add-task">+ Add Task</div>
+        <form class="task-form">
+          <input
+            type="text"
+            name="task-name"
+            placeholder="Task Name"
+            id="task-title"
+            required
+          />
+          <input
+            type="text"
+            name="description"
+            placeholder="Description"
+            id="task-description"
+            required
+          />
+
+          <label for="due-date">Due Date</label>
+          <input type="date" id="task-due-date" name="due-date" required />
+
+          <label for="priority">Priority</label>
+          <select id="task-priority" name="priority" required>
+            <option value="">Select priority</option>
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+          </select>
+
+          <button type="submit">Add Task</button>
+        </form>
+      </div>
+    </main>
+  </body>
+</html>
+
+<!-- #F9F9F9 -->
