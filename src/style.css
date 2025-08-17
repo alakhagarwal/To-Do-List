@@ -166,8 +166,8 @@ main {
 .checkbox {
   margin-right: 10px;
   appearance: none;
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   border: 2px solid #555;
   border-radius: 50%;
   outline: none;
@@ -180,7 +180,7 @@ main {
   padding: 2px;
 }
 
-.checked {
+.checkbox.checked {
   background-color: #4caf50;
   height: 25px;
 }

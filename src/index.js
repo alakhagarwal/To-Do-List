@@ -1,9 +1,9 @@
 import "./style.css";
 
 class Project {
-  constructor(title) {
+  constructor(title, todos = []) {
     this.title = title;
-    this.todos = [];
+    this.todos = todos;
   }
 
   addtodo(todo) {
@@ -12,26 +12,66 @@ class Project {
 }
 
 class Todo {
-  constructor(title, description, dueDate, priority) {
+  constructor(title, description, dueDate, priority, status = false) {
     this.title = title;
     this.description = description;
     this.dueDate = dueDate;
     this.priority = priority;
-    this.status = false;
+    this.status = status;
   }
 }
 
-let projects = [];
-let currProject;
+// write function to load project from local storage..project is an array of class instances
+function loadProjects() {
+  const saved = localStorage.getItem("projects");
+  if (!saved) {
+    return [];
+  }
+  const savedProjects = JSON.parse(saved);
+
+  return savedProjects.map((project) => {
+    const Todos = project.todos.map(
+      (todo) =>
+        new Todo(
+          todo.title,
+          todo.description,
+          new Date(todo.dueDate),
+          todo.priority,
+          todo.status
+        )
+    );
+    return new Project(project.title, Todos);
+  });
+}
+
+function saveProjects() {
+  const projectsJSON = JSON.stringify(projects);
+  localStorage.setItem("projects", projectsJSON);
+}
+
+let projects;
+
+window.onload = function () {
+  projects = loadProjects();
+  DisplayAllProjects();
+  const clickEvent = new Event("click");
+  showAllProjectsToggle.dispatchEvent(clickEvent); // <-- This line triggers the click and makes it active
+  // Rest of your code...
+};
+
+let currProject = null;
 
 const projectFormtoggle = document.querySelector(".toggleProjectform");
 const projectForm = document.querySelector(".project-form");
 const ProjectList = document.querySelector(".project-list");
 const todoList = document.querySelector(".todos-list");
 
-
 function displayNewTodo() {
   todoList.innerHTML = "";
+
+  if (!currProject) {
+    return;
+  }
 
   for (let todo of currProject.todos) {
     const TaskDiv = document.createElement("div");
@@ -53,7 +93,8 @@ function displayNewTodo() {
     TaskDiv.appendChild(deleteTodo);
 
     if (todo.status) {
-      TaskDiv.classList.add("checked");
+      checkBox.classList.add("checked");
+      checkBox.textContent = "✓";
     }
 
     todoList.appendChild(TaskDiv);
@@ -68,13 +109,14 @@ function displayNewTodo() {
         checkBox.classList.remove("checked");
         checkBox.textContent = " ";
       }
+      saveProjects();
     });
-
 
     deleteTodo.addEventListener("click", () => {
       currProject.todos = currProject.todos.filter((t) => t !== todo);
       // removes the todo from the array
       displayNewTodo();
+      saveProjects();
     });
   }
 }
@@ -93,37 +135,50 @@ function displayNewProject(project) {
   ProjectList.appendChild(projectDiv);
 
   //adding event listener or delete icon
-  deleteProject.addEventListener("click", () => {
-    projects.splice(projects.indexOf(project), 1);
-    projectDiv.remove(); // deletes it from the DOM
-
-    if (currProject === project) {
-      currProject = null;
-    }
-  });
 
   projectDiv.addEventListener("click", () => {
-    const projectDivs = Array.from(ProjectList.children);
+    const projectDivs = document.querySelectorAll(".optn");
     projectDivs.forEach((p) => {
       p.classList.remove("active");
     });
 
     currProject = project;
+
+   
+    
+
     projectDiv.classList.add("active");
 
     displayNewTodo(); // check the working of delete button
   });
-  displayNewTodo();
+
+  deleteProject.addEventListener("click", (e) => {
+    e.stopPropagation(); // Prevent project selection when deleting
+
+    // Remove project from array
+    projects = projects.filter((p) => p !== project);
+
+    // Remove from DOM
+    projectDiv.remove();
+
+    // Clear current project if it was deleted
+    if (currProject === project) {
+      currProject = null;
+      todoList.innerHTML = "";
+    }
+
+    saveProjects();
+  });
+
+
 
   const clickEvent = new Event("click");
   projectDiv.dispatchEvent(clickEvent); // <-- This line triggers the click and makes it active
 }
 
-
 projectFormtoggle.addEventListener("click", () => {
   projectForm.classList.add("show");
 });
-
 
 projectForm.addEventListener("submit", (e) => {
   e.preventDefault();
@@ -133,20 +188,23 @@ projectForm.addEventListener("submit", (e) => {
   projectForm.classList.remove("show");
   projectForm.reset();
 
+  currProject = project;
+  // console.log(currProject);
+  // console.log(project);
 
-  currProject = projects[projects.length - 1];
-  console.log(currProject);
-  console.log(projects[projects.length - 1]);
-
-  displayNewProject(projects[projects.length - 1]);
-
+  displayNewProject(project);
+  saveProjects();
 });
+
 
 const addTaskToggle = document.querySelector(".add-task");
 const addTaskForm = document.querySelector(".task-form");
 
 addTaskToggle.addEventListener("click", () => {
-  addTaskForm.style.display = "block";
+  if (currProject === null) {
+    alert("Please select a project first");
+    return; // stops the function from executing further if the project is not selected.
+  }
   addTaskForm.classList.add("show");
 });
 
@@ -161,7 +219,78 @@ addTaskForm.addEventListener("submit", (e) => {
   addTaskForm.reset();
 
   const todo = new Todo(title, description, dueDate, priority);
-  console.log(todo);
+  // console.log(todo);
   currProject.addtodo(todo);
   displayNewTodo();
+  saveProjects();
 });
+
+const showAllProjectsToggle = document.querySelector(".all");
+
+showAllProjectsToggle.addEventListener("click", () => {
+  const projectDivs = document.querySelectorAll(".optn");
+  projectDivs.forEach((p) => {
+    p.classList.remove("active");
+  });
+  showAllProjectsToggle.classList.add("active");
+  currProject = null;
+  todoList.innerHTML = "";
+
+  for (let project of projects) {
+    for (let todo of project.todos) {
+      const TaskDiv = document.createElement("div");
+      TaskDiv.classList.add("task");
+      const info = document.createElement("div");
+      info.classList.add("info");
+      const checkBox = document.createElement("div");
+      checkBox.classList.add("checkbox");
+      const title = document.createElement("span");
+      title.textContent = todo.title;
+      info.appendChild(checkBox);
+      info.appendChild(title);
+
+      const deleteTodo = document.createElement("i");
+      deleteTodo.classList.add("fa-solid");
+      deleteTodo.classList.add("fa-xmark");
+
+      TaskDiv.appendChild(info);
+      TaskDiv.appendChild(deleteTodo);
+
+      if (todo.status) {
+        checkBox.classList.add("checked");
+        checkBox.textContent = "✓";
+      }
+
+      todoList.appendChild(TaskDiv);
+
+      checkBox.addEventListener("click", () => {
+        todo.status = !todo.status;
+
+        if (todo.status) {
+          checkBox.classList.add("checked");
+          checkBox.textContent = "✓";
+        } else {
+          checkBox.classList.remove("checked");
+          checkBox.textContent = " ";
+        }
+        saveProjects();
+      });
+
+      deleteTodo.addEventListener("click", () => {
+        project.todos = project.todos.filter((t) => t !== todo);
+        // removes the todo from the array
+        showAllProjectsToggle.click();
+        saveProjects();
+      });
+      saveProjects();
+    }
+  }
+});
+
+function DisplayAllProjects() {
+  ProjectList.innerHTML = "";
+  console.log(projects);
+  for (let project of projects) {
+    displayNewProject(project);
+  }
+}
