@@ -16,14 +16,44 @@ header {
   height: 8vh;
   padding: 12px;
   display: flex;
+  align-items: center;
   gap: 1vw;
   padding-left: 20px;
   color: white;
 }
+header > p {
+  font-size: 120%;
+}
+
+.toggleSidebar {
+  cursor: pointer;
+  display: none;
+}
+
+.toggleSidebar:active {
+  transform: scale(1.2);
+}
+
+.close-icon {
+  font-size: 1.5rem;
+  text-align: right;
+  left: 0;
+  border: 1px solid #fff;
+  display: flex;
+  justify-content: end;
+  padding: 2px;
+  padding-left: 5px;
+  transform: all 0.3s ease-in-out;
+  display: none;
+}
+
+.close-icon:hover {
+  scale: scale(1.1);
+}
 
 main {
   display: grid;
-  grid-template-columns: 0.25fr 1fr;
+  grid-template-columns: 0.3fr 1fr;
   height: 92vh; /* Add this line */
   overflow: hidden;
 }
@@ -34,8 +64,12 @@ main {
   padding: 16px;
   position: sticky;
   top: 0;
-
+  transform: all 1s ease-in-out;
   /* overflow-y: auto; */
+}
+
+.showpanel {
+  transform: translateX(0);
 }
 
 .optns {
@@ -307,4 +341,43 @@ main {
 
 .show-info {
   display: block;
+}
+
+@media screen and (max-width: 1000px) {
+  
+  .toggleSidebar {
+    cursor: pointer;
+    display: flex;
+  }
+
+  .left-panel {
+    position: absolute;
+    transition: all 0.3s ease-out;
+    overflow: auto;
+    z-index: 1000;
+    transform: translateX(-100%);
+    width: 250px;
+    transform: translateX(-100%);
+  }
+
+  .toggleSidebar:active {
+    transform: scale(1.2);
+  }
+
+  .left-panel.show {
+    transform: translateX(0);
+  }
+
+  main {
+    display: flex;
+  }
+
+
+  .right-panel{
+    flex: 1;
+  }
+
+  .close-icon {
+    display: flex;
+  }
 }

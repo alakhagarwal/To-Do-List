@@ -21,6 +21,21 @@ class Todo {
   }
 }
 
+const toggleSidebar = document.querySelector(".toggleSidebar");
+
+toggleSidebar.addEventListener("click", () => {
+  const sidebar = document.querySelector(".left-panel");
+  sidebar.classList.toggle("show");
+  // sidebar.remove();
+});
+
+const sidebarCloseIcon = document.querySelector(".close-icon");
+
+sidebarCloseIcon.addEventListener("click", () => {
+  const sidebar = document.querySelector(".left-panel");
+  sidebar.classList.remove("show");
+});
+
 // write function to load project from local storage..project is an array of class instances
 function loadProjects() {
   const saved = localStorage.getItem("projects");
@@ -140,7 +155,7 @@ function displayNewTodo() {
 
     todoList.appendChild(mainTaskDiv);
 
-    checkBox.addEventListener("click", () => {
+    checkBox.addEventListener("click", (event) => {
       event.stopPropagation();
       todo.status = !todo.status;
 
@@ -154,7 +169,7 @@ function displayNewTodo() {
       saveProjects();
     });
 
-    deleteTodo.addEventListener("click", () => {
+    deleteTodo.addEventListener("click", (event) => {
       event.stopPropagation();
       currProject.todos = currProject.todos.filter((t) => t !== todo);
       displayNewTodo();
@@ -179,6 +194,7 @@ function displayNewProject(project) {
   //adding event listener or delete icon
 
   projectDiv.addEventListener("click", () => {
+    addTaskForm.classList.remove("show");
     const projectDivs = document.querySelectorAll(".optn");
     projectDivs.forEach((p) => {
       p.classList.remove("active");
@@ -250,20 +266,27 @@ addTaskForm.addEventListener("submit", (e) => {
   const description = document.querySelector("#task-description").value;
   const dueDate = document.querySelector("#task-due-date").value;
   const priority = document.querySelector("#task-priority").value;
+  const now = new Date();
+  const taskDate = new Date(dueDate);
 
-  addTaskForm.classList.remove("show");
-  addTaskForm.reset();
+  if (taskDate > now) {
+    addTaskForm.classList.remove("show");
+    addTaskForm.reset();
 
-  const todo = new Todo(title, description, dueDate, priority);
-  // console.log(todo);
-  currProject.addtodo(todo);
-  displayNewTodo();
-  saveProjects();
+    const todo = new Todo(title, description, dueDate, priority);
+    // console.log(todo);
+    currProject.addtodo(todo);
+    displayNewTodo();
+    saveProjects();
+  } else {
+    alert("Due date should be in the future");
+  }
 });
 
 const showAllProjectsToggle = document.querySelector(".all");
 
 showAllProjectsToggle.addEventListener("click", () => {
+  addTaskForm.classList.remove("show");
   const projectDivs = document.querySelectorAll(".optn");
   projectDivs.forEach((p) => {
     p.classList.remove("active");
@@ -340,8 +363,8 @@ showAllProjectsToggle.addEventListener("click", () => {
 
       todoList.appendChild(mainTaskDiv);
 
-      checkBox.addEventListener("click", () => {
-        event.stopPropagation();
+      checkBox.addEventListener("click", (event) => {
+        event.stopPropagation(); // doesnt carry the event to the parent element
         todo.status = !todo.status;
 
         if (todo.status) {
@@ -354,10 +377,11 @@ showAllProjectsToggle.addEventListener("click", () => {
         saveProjects();
       });
 
-      deleteTodo.addEventListener("click", () => {
+      deleteTodo.addEventListener("click", (event) => {
         event.stopPropagation();
-        currProject.todos = currProject.todos.filter((t) => t !== todo);
-        displayNewTodo();
+        project.todos = project.todos.filter((t) => t !== todo);
+        const clickEvent = new Event("click");
+        showAllProjectsToggle.dispatchEvent(clickEvent);
         saveProjects();
       });
     }
