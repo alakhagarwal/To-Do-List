@@ -74,6 +74,7 @@ function displayNewTodo() {
   }
 
   for (let todo of currProject.todos) {
+    const mainTaskDiv = document.createElement("div");
     const TaskDiv = document.createElement("div");
     TaskDiv.classList.add("task");
     const info = document.createElement("div");
@@ -85,21 +86,62 @@ function displayNewTodo() {
     info.appendChild(checkBox);
     info.appendChild(title);
 
+    const todoInfo = document.createElement("div");
+    todoInfo.classList.add("todo-info");
+
+    // Create detailed info with icons
+    const descriptionDiv = document.createElement("div");
+    descriptionDiv.classList.add("todo-detail");
+    descriptionDiv.innerHTML = `
+                <i class="fas fa-align-left"></i>
+                <span><strong>Description:</strong> ${todo.description}</span>
+            `;
+
+    const dueDateDiv = document.createElement("div");
+    dueDateDiv.classList.add("todo-detail");
+    dueDateDiv.innerHTML = `
+                <i class="fas fa-calendar"></i>
+                <span><strong>Due Date:</strong> ${new Date(
+                  todo.dueDate
+                ).toLocaleDateString()}</span>
+            `;
+
+    const priorityDiv = document.createElement("div");
+    priorityDiv.classList.add("todo-detail");
+    const priorityClass = `priority-${todo.priority}`;
+    priorityDiv.innerHTML = `
+                <i class="fas fa-flag ${priorityClass}"></i>
+                <span><strong>Priority:</strong> <span class="${priorityClass}">${todo.priority.toUpperCase()}</span></span>
+            `;
+
+    todoInfo.appendChild(descriptionDiv);
+    todoInfo.appendChild(dueDateDiv);
+    todoInfo.appendChild(priorityDiv);
+
+    // Show/hide info when clicking the task (excluding checkbox and delete icon)
+    TaskDiv.addEventListener("click", (e) => {
+      // Prevent toggling when clicking checkbox
+      todoInfo.classList.toggle("show-info");
+    });
+
     const deleteTodo = document.createElement("i");
     deleteTodo.classList.add("fa-solid");
     deleteTodo.classList.add("fa-xmark");
 
     TaskDiv.appendChild(info);
     TaskDiv.appendChild(deleteTodo);
+    mainTaskDiv.appendChild(TaskDiv);
+    mainTaskDiv.appendChild(todoInfo);
 
     if (todo.status) {
       checkBox.classList.add("checked");
       checkBox.textContent = "✓";
     }
 
-    todoList.appendChild(TaskDiv);
+    todoList.appendChild(mainTaskDiv);
 
     checkBox.addEventListener("click", () => {
+      event.stopPropagation();
       todo.status = !todo.status;
 
       if (todo.status) {
@@ -113,8 +155,8 @@ function displayNewTodo() {
     });
 
     deleteTodo.addEventListener("click", () => {
+      event.stopPropagation();
       currProject.todos = currProject.todos.filter((t) => t !== todo);
-      // removes the todo from the array
       displayNewTodo();
       saveProjects();
     });
@@ -144,9 +186,6 @@ function displayNewProject(project) {
 
     currProject = project;
 
-   
-    
-
     projectDiv.classList.add("active");
 
     displayNewTodo(); // check the working of delete button
@@ -169,8 +208,6 @@ function displayNewProject(project) {
 
     saveProjects();
   });
-
-
 
   const clickEvent = new Event("click");
   projectDiv.dispatchEvent(clickEvent); // <-- This line triggers the click and makes it active
@@ -195,7 +232,6 @@ projectForm.addEventListener("submit", (e) => {
   displayNewProject(project);
   saveProjects();
 });
-
 
 const addTaskToggle = document.querySelector(".add-task");
 const addTaskForm = document.querySelector(".task-form");
@@ -238,6 +274,7 @@ showAllProjectsToggle.addEventListener("click", () => {
 
   for (let project of projects) {
     for (let todo of project.todos) {
+      const mainTaskDiv = document.createElement("div");
       const TaskDiv = document.createElement("div");
       TaskDiv.classList.add("task");
       const info = document.createElement("div");
@@ -249,21 +286,62 @@ showAllProjectsToggle.addEventListener("click", () => {
       info.appendChild(checkBox);
       info.appendChild(title);
 
+      const todoInfo = document.createElement("div");
+      todoInfo.classList.add("todo-info");
+
+      // Create detailed info with icons
+      const descriptionDiv = document.createElement("div");
+      descriptionDiv.classList.add("todo-detail");
+      descriptionDiv.innerHTML = `
+                <i class="fas fa-align-left"></i>
+                <span><strong>Description:</strong> ${todo.description}</span>
+            `;
+
+      const dueDateDiv = document.createElement("div");
+      dueDateDiv.classList.add("todo-detail");
+      dueDateDiv.innerHTML = `
+                <i class="fas fa-calendar"></i>
+                <span><strong>Due Date:</strong> ${new Date(
+                  todo.dueDate
+                ).toLocaleDateString()}</span>
+            `;
+
+      const priorityDiv = document.createElement("div");
+      priorityDiv.classList.add("todo-detail");
+      const priorityClass = `priority-${todo.priority}`;
+      priorityDiv.innerHTML = `
+                <i class="fas fa-flag ${priorityClass}"></i>
+                <span><strong>Priority:</strong> <span class="${priorityClass}">${todo.priority.toUpperCase()}</span></span>
+            `;
+
+      todoInfo.appendChild(descriptionDiv);
+      todoInfo.appendChild(dueDateDiv);
+      todoInfo.appendChild(priorityDiv);
+
+      // Show/hide info when clicking the task (excluding checkbox and delete icon)
+      TaskDiv.addEventListener("click", (e) => {
+        // Prevent toggling when clicking checkbox
+        todoInfo.classList.toggle("show-info");
+      });
+
       const deleteTodo = document.createElement("i");
       deleteTodo.classList.add("fa-solid");
       deleteTodo.classList.add("fa-xmark");
 
       TaskDiv.appendChild(info);
       TaskDiv.appendChild(deleteTodo);
+      mainTaskDiv.appendChild(TaskDiv);
+      mainTaskDiv.appendChild(todoInfo);
 
       if (todo.status) {
         checkBox.classList.add("checked");
         checkBox.textContent = "✓";
       }
 
-      todoList.appendChild(TaskDiv);
+      todoList.appendChild(mainTaskDiv);
 
       checkBox.addEventListener("click", () => {
+        event.stopPropagation();
         todo.status = !todo.status;
 
         if (todo.status) {
@@ -277,12 +355,11 @@ showAllProjectsToggle.addEventListener("click", () => {
       });
 
       deleteTodo.addEventListener("click", () => {
-        project.todos = project.todos.filter((t) => t !== todo);
-        // removes the todo from the array
-        showAllProjectsToggle.click();
+        event.stopPropagation();
+        currProject.todos = currProject.todos.filter((t) => t !== todo);
+        displayNewTodo();
         saveProjects();
       });
-      saveProjects();
     }
   }
 });

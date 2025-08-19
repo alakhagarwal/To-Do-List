@@ -296,3 +296,15 @@ main {
 .project i {
   opacity: 0.6;
 }
+
+.todo-info {
+  display: none;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+  font-size: 1.2em;
+}
+
+.show-info {
+  display: block;
+}
